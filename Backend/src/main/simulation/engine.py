@@ -1,3 +1,7 @@
+import random
+import math
+from .models import Robot, Waste
+
 class SimulationEngine:
     def __init__(self, simulation):
         self.simulation = simulation
@@ -66,16 +70,17 @@ class SimulationEngine:
             memory['known_waste'] = []
         
         for (x, y), cell_type in vision.items():
-            if (x, y) not in memory['explored']:
-                memory['explored'].append((x, y))
+            pos_tuple = [x, y]  # Convert to list for JSON serialization
+            if pos_tuple not in memory['explored']:
+                memory['explored'].append(pos_tuple)
             
-            if cell_type == 'waste' and (x, y) not in memory['known_waste']:
-                memory['known_waste'].append((x, y))
+            if cell_type == 'waste' and pos_tuple not in memory['known_waste']:
+                memory['known_waste'].append(pos_tuple)
         
         # Nettoyer les déchets collectés de la mémoire
         memory['known_waste'] = [
-            (x, y) for (x, y) in memory['known_waste']
-            if self.simulation.waste_items.filter(x=x, y=y, collected=False).exists()
+            pos for pos in memory['known_waste']
+            if self.simulation.waste_items.filter(x=pos[0], y=pos[1], collected=False).exists()
         ]
         
         robot.memory = memory
@@ -114,9 +119,9 @@ class SimulationEngine:
         if known_waste:
             closest_waste = min(
                 known_waste,
-                key=lambda pos: self.calculate_distance((robot.x, robot.y), pos)
+                key=lambda pos: self.calculate_distance((robot.x, robot.y), tuple(pos))
             )
-            return self.move_towards_target(robot, closest_waste)
+            return self.move_towards_target(robot, tuple(closest_waste))
         
         # Exploration vers une zone inexplorée
         return self.explore_unknown_area(robot)
@@ -140,13 +145,13 @@ class SimulationEngine:
     def explore_unknown_area(self, robot):
         """Explore une zone inconnue"""
         memory = robot.memory or {}
-        explored = set(memory.get('explored', []))
+        explored = {tuple(pos) for pos in memory.get('explored', [])}
         
         valid_moves = self.get_valid_moves(robot)
         if not valid_moves:
             return 'wait'
         
-        # mouvements vers des zones inexplorées
+        # Prioriser les mouvements vers des zones inexplorées
         unexplored_moves = [move for move in valid_moves if move not in explored]
         
         if unexplored_moves:
