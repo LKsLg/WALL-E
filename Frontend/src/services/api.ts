@@ -19,6 +19,10 @@ export async function startSimulation(id: number) {
   await axios.post(`${BASE_URL}/${id}/start/`);
 }
 
+export async function pauseSimulation(id: number) {
+  await axios.post(`${BASE_URL}/${id}/pause/`);
+}
+
 export async function stepSimulation(id: number) {
   await axios.post(`${BASE_URL}/${id}/step/`);
 }
