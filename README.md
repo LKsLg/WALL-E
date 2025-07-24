@@ -42,7 +42,7 @@ venv\Scripts\activate  # Windows
 pip install -r requirements.txt
 
 # Migrations
-python manage.py makemigrations
+python manage.py makemigrations simulation
 python manage.py migrate
 
 # Démarrer le serveur
