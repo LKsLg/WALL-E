@@ -1,21 +1,39 @@
-import axios from "axios";
-import { SimulationConfig, GridState } from "../types/models";
+import axios from 'axios';
+import { Simulation, GridState, SimulationConfig } from '../types/models';
 
-const BASE_URL = "http://localhost:8000/api/simulation";
+const BASE_URL = 'http://localhost:8000/api/simulations';
 
-export async function startSimulation(config: SimulationConfig) {
-    await axios.post(`${BASE_URL}/start`, config);
+export async function createSimulation(config: SimulationConfig): Promise<Simulation> {
+  const res = await axios.post(BASE_URL + '/', {
+    name: "Sim",
+    grid_size: 32,
+    num_robots: config.robots,
+    num_waste: config.trash,
+    base_x: config.base.x,
+    base_y: config.base.y,
+  });
+  return res.data;
 }
 
-export async function pauseSimulation() {
-    await axios.post(`${BASE_URL}/pause`);
+export async function startSimulation(id: number) {
+  await axios.post(`${BASE_URL}/${id}/start/`);
 }
 
-export async function resetSimulation() {
-    await axios.post(`${BASE_URL}/reset`);
+export async function stepSimulation(id: number) {
+  await axios.post(`${BASE_URL}/${id}/step/`);
 }
 
-export async function getSimulationState(): Promise<GridState> {
-    const res = await axios.get<GridState>(`${BASE_URL}/state`);
-    return res.data;
+export async function resetSimulation(id: number) {
+  const res = await axios.post(`${BASE_URL}/${id}/reset/`);
+  return res.data;
+}
+
+export async function getGridState(id: number): Promise<GridState> {
+  const res = await axios.get(`${BASE_URL}/${id}/grid_state/`);
+  return res.data;
+}
+
+export async function getStats(id: number) {
+  const res = await axios.get(`${BASE_URL}/${id}/statistics/`);
+  return res.data;
 }
