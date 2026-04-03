@@ -1,6 +1,6 @@
 Une simulation d'équipe de robots autonomes nettoyant une zone contenant des déchets, inspirée du projet technique WALL-E.
 
-#Description
+# Description
 
 Cette application simule une équipe de robots collaborant pour nettoyer efficacement une grille 32x32 contenant des déchets. Les robots utilisent des stratégies intelligentes d'exploration et de communication pour optimiser leur travail.
 
